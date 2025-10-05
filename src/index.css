@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Se quiser, adicione seus utilitários globais depois daqui. */
