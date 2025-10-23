@@ -904,27 +904,9 @@ def alterarValor(data):
 
 
 
-@socketio.on('atualizar_pedidos')
-def handle_atualizar_pedidos(data):
-    dia = datetime.now(brazil).date()
-    p = data.get('pedidoAlterado')
-    usuario=data.get('usuario')
-    alteracoes=f'{p["pedido"]}, '
-    token_user = data.get('token')
-    preco = db.execute(
-        'SELECT comanda,preco,quantidade,extra,pedido FROM pedidos WHERE id = ? AND dia = ?', p['id'],dia)
-    if preco : 
-        p2 = preco[0]
-        dif={k:(p[k],p2[k]) for k in p.keys() & p2.keys() if p[k]!=p2[k]}.keys()
-        for key in dif:
-            alteracoes+=f'{key} de {p2[key]} para {p[key]} '
-        print(alteracoes)
-        db.execute("UPDATE pedidos SET comanda = ?, pedido = ?, quantidade = ?, extra = ?,preco = ? WHERE id = ? AND dia = ?",
-               p["comanda"], p["pedido"], p["quantidade"], p["extra"], p["preco"], p["id"],dia)
-    insertAlteracoesTable('pedidos',alteracoes,'editou','Tela Pedidos',usuario)
-    alteracoes=f'{usuario} Editou {alteracoes}'
-    enviar_notificacao_expo('ADM','Pedido Editado',alteracoes,token_user,usuario)
-    handle_get_cardapio(str(p["comanda"]))
+from datetime import datetime
+from flask_socketio import emit
+
 
 
 @socketio.on('desfazer_pagamento')
