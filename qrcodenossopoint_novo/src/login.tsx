@@ -26,7 +26,7 @@ useEffect(() => {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   (async () => {
-    const KEY = 'hQ2yZkb5DJANmEGdD3w90YqH8jCFaT1NboM5nLz7tSReKdkneBJ4J53Lop19A';
+    const KEY = 'comanda';
 
     const number = params.get(KEY);
     console.log('numero',number)
@@ -183,43 +183,47 @@ const App = () => {
   };
 
   // Simula a verificação do código.
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (!verificationCode.trim()) {
-      setError("Digite o código recebido por SMS.");
-      return;
-    }
+   const handleVerify = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      const code = true
-      if (code){
-      setIsLoading(true);
-      const numberWithPrefix = '+55'+phoneNumber
-      const resp = await fetch(`https://flask-backend-server-yxom.onrender.com/auth/sms/check`, {
+  if (!verificationCode.trim()) {
+    setError("Digite o código recebido por SMS.");
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    const numberWithPrefix = "+55" + phoneNumber.replace(/\D/g, ""); // garante só dígitos
+    const resp = await fetch(
+      "https://flask-backend-server-yxom.onrender.com/auth/sms/check",
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: numberWithPrefix, code:  verificationCode }),
-      });
+        body: JSON.stringify({
+          phone: numberWithPrefix,
+          code: verificationCode.trim(),
+        }),
+      }
+    );
 
-      const data = await resp.json().catch(() => ({}));
-      if (!resp.ok) {
-        if (data?.detail) throw new Error(data.detail);
-        throw new Error(`Erro na verificação (${resp.status}).`);
-      }
-      }
-      // Backend retorna { status: "approved" } quando o código está certo
-      if (data?.status === "approved") {
-        setView("success");
-      } else {
-        setError("Código de verificação incorreto ou expirado. Tente novamente.");
-      }
-    } catch (err: any) {
-      setError(err.message || "Falha ao verificar código.");
-    } finally {
-      setIsLoading(false);
+    const data = await resp.json().catch(() => ({} as any));
+
+
+    // sucesso HTTP: checa payload
+    if (data?.status === "approved") {
+      setView("success");
+    } else {
+      setError("Código de verificação incorreto ou expirado. Tente novamente.");
     }
-  };
+  } catch (err: any) {
+    setError(err?.message || "Falha ao verificar código.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const renderLoginView = () => (
   <form onSubmit={handleLogin} className="w-full flex flex-col items-center">
