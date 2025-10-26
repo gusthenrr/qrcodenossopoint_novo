@@ -35,7 +35,7 @@ useEffect(() => {
       navigate('/erro', { replace: true });
       return;
     }
-    fetch('http://192.168.15.16:8000/validate_table_number_on_qr', {
+    fetch('https://flask-backend-server-yxom.onrender.com/validate_table_number_on_qr', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ useEffect(() => {
     })
 
     try {
-      const resp = await fetch('http://192.168.15.16:8000/guardar_login', {
+      const resp = await fetch('https://flask-backend-server-yxom.onrender.com/guardar_login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ numero }),
@@ -116,7 +116,7 @@ const App = () => {
   useEffect(()=>{
     const tokenAuth = localStorage.getItem('authToken')
     if (tokenAuth){
-      const KEY = 'hQ2yZkb5DJANmEGdD3w90YqH8jCFaT1NboM5nLz7tSReKdkneBJ4J53Lop19A';
+      const KEY = 'comanda';
       navigate(`/cardapio?${KEY}=${params.get(KEY)}`, {replace:true})
     }
     
@@ -153,7 +153,7 @@ const App = () => {
       const code = true
       if (code){  
       setIsLoading(true);
-      const resp = await fetch(`http://192.168.15.16:8000/auth/sms/create`, {
+      const resp = await fetch(`https://flask-backend-server-yxom.onrender.com/auth/sms/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({ phone:numberWithPrefix }),
@@ -196,7 +196,7 @@ const App = () => {
       if (code){
       setIsLoading(true);
       const numberWithPrefix = '+55'+phoneNumber
-      const resp = await fetch(`http://192.168.15.16:8000/auth/sms/check`, {
+      const resp = await fetch(`https://flask-backend-server-yxom.onrender.com/auth/sms/check`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: numberWithPrefix, code:  verificationCode }),
@@ -209,8 +209,7 @@ const App = () => {
       }
       }
       // Backend retorna { status: "approved" } quando o código está certo
-      //if (data?.status === "approved") {
-      if (1){
+      if (data?.status === "approved") {
         setView("success");
       } else {
         setError("Código de verificação incorreto ou expirado. Tente novamente.");

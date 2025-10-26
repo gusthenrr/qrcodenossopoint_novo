@@ -211,7 +211,7 @@ const App = () => {
   const [canRight, setCanRight] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
-  const keyParams = 'hQ2yZkb5DJANmEGdD3w90YqH8jCFaT1NboM5nLz7tSReKdkneBJ4J53Lop19A'; 
+  const keyParams = 'comanda'; 
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   // ⬇️ RESUMO DA COMANDA (vindo do backend via socket)
@@ -256,7 +256,7 @@ const App = () => {
   useEffect(() => {
     if (socketRef.current) return;
   
-    const s = io("http://192.168.15.16:8000", {
+    const s = io("https://flask-backend-server-yxom.onrender.com", {
       transports: ["websocket"], // pode adicionar ['websocket', 'polling'] se quiser buffer automático
       autoConnect: true,
     });
@@ -343,7 +343,7 @@ const App = () => {
       navigate(`/login?${keyParams}=${params.get(keyParams)}`, { replace: true });
     }
     else{
-      fetch('http://192.168.15.16:8000/validate_token_on_qr', {
+      fetch('https://flask-backend-server-yxom.onrender.com/validate_token_on_qr', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -383,7 +383,7 @@ const App = () => {
   useEffect(() => {
     const numero = params.get(keyParams);
     if (numero){
-    fetch('http://192.168.15.16:8000/validate_table_number_on_qr', {
+    fetch('https://flask-backend-server-yxom.onrender.com/validate_table_number_on_qr', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -443,40 +443,6 @@ const App = () => {
 }, [selectedMainCategory, subFilters.length]);
 
 
-// === FUNÇÕES PIX ===
-const generatePix = async () => {
-  try {
-    setPixLoading(true);
-    setPixQR(null);
-    setPixPayload(null);
-
-    const r = await fetch("http://192.168.15.16:8000/pix/qr", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        pedido_id: currentOrderId,
-        valor: Number(total).toFixed(2),
-        descricao: `Pedido ${currentOrderId}`
-      })
-    });
-    const j = await r.json();
-    console.log("Resposta Pix:", j);
-    if (!r.ok) throw new Error(j?.error || "Erro ao gerar Pix");
-
-    setPixQR(j.qr_png_base64);
-    setPixPayload(j.payload);
-  } catch (err: any) {
-    alert(err.message || "Falha ao gerar QR Pix");
-  } finally {
-    setPixLoading(false);
-  }
-};
-
-const copyPixCode = async () => {
-  if (!pixPayload) return;
-  await navigator.clipboard.writeText(pixPayload);
-  alert("Código Pix copiado!");
-};
 
 // Alterna seleção de uma opção dentro de um grupo
 const toggleSelection = (
@@ -592,13 +558,6 @@ const openResumoDrawer = () => {
           className="w-full py-3 px-4 rounded-xl border border-gray-300 hover:bg-gray-50 font-semibold"
         >
           Continuar comprando
-        </button>
-
-        <button
-          onClick={() => { setShowPayChoice(false); setShowPixCheckout(true); }}
-          className="w-full py-3 px-4 rounded-xl bg-black text-white hover:opacity-90 font-semibold flex items-center justify-center gap-2"
-        >
-          <QrCode size={18}/> Pagar pelo Pix
         </button>
       </div>
     </div>
@@ -1295,13 +1254,6 @@ const renderPixCheckoutModal = () => (
       </div>
 
       <div className="flex-1 flex flex-col sm:flex-row justify-end items-center space-y-2 sm:space-y-0 sm:space-x-4">
-        {/* PAGAR NO APP -> abre modal de escolha */}
-        <button
-          onClick={(e) => { e.stopPropagation(); setShowPayChoice(true); }}
-          className="w-full sm:w-auto px-6 py-3 bg-black text-white font-semibold rounded-xl hover:opacity-80 transition-opacity"
-        >
-          Pagar no App
-        </button>
 
         {/* FAZER PEDIDO -> mantém fluxo atual */}
         <button
