@@ -12,7 +12,7 @@ type OptionGroup = {
   ids?: string;
   options: OptionItem[];
   max_selected?: number; // default: 1 (single)
-  obrigatorio?: boolean; // 👈 NOVO
+  obrigatorio?: boolean; // 👈 NOV
 };
 const formatBRL = (n: any) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
